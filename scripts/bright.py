@@ -5,7 +5,7 @@ def is_room_bright(image, threshold=100):
     """
     Check if the room is bright based on the image brightness.
     :param image_path: path to the image file
-    :param threshold: brightness threshold (default is 100)
+    :param threshol   d: brightness threshold (default is 100)
     :return: True if the room is bright, False otherwise
     """
 

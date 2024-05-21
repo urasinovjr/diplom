@@ -34,13 +34,8 @@ def process_output(output_data):
 
 def draw_skeleton(image, keypoints):
     connections = [
-        (0, 1), (1, 2),
-        (0, 3), (3, 4),
-        (5, 6), (6, 7),
-        (5, 8), (8, 9),
-        (10, 11), (11, 12),
-        (13, 14), (14, 15),
-        (16, 17), (17, 18)
+    (0, 1), (0, 2), (1, 3), (2, 4), (5, 6), (5, 7), (7, 9), (6, 8), (8, 10),
+    (11, 12), (5, 11), (6, 12), (11, 13), (13, 15), (12, 14), (14, 16)
     ]
     for a, b in connections:
         y1, x1 = int(keypoints[a][1] * image.shape[0]), int(keypoints[a][0] * image.shape[1])
@@ -50,6 +45,7 @@ def draw_skeleton(image, keypoints):
 def draw_poses(image, output_data):
     for pose_data in output_data:
         keypoints = process_output(pose_data)
+        print(keypoints)
         if keypoints is not None:
             for keypoint in keypoints:
                 if keypoint['confidence'] > 0.2: 
