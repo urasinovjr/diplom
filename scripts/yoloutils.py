@@ -64,9 +64,9 @@ def infer_image(net, layer_names, height, width, img, colors, labels,
 
         print ("[INFO] YOLOv3 took {:6f} seconds".format(end - start))
 
-        boxes, confidences, classids = generate_boxes_confidences_classids(outs, height, width, 0.3)
+        boxes, confidences, classids = generate_boxes_confidences_classids(outs, height, width, 0.5)
         
-        idxs = cv.dnn.NMSBoxes(boxes, confidences, 0.3, 0.2)
+        idxs = cv.dnn.NMSBoxes(boxes, confidences, 0.5, 0.2)
 
     if boxes is None or confidences is None or idxs is None or classids is None:
         raise '[ERROR] Required variables are set to None before drawing boxes on images.'

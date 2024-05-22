@@ -97,25 +97,27 @@ with open(csv_filename, mode='w', newline='', encoding="utf-8") as csv_file:
                         w, h = boxes[i][2], boxes[i][3]
                         cropped_image = frame[y:y+h, x:x+w]
 
-                        poses = posenet_detector.process_image(cropped_image)
-                        draw_poses(cropped_image, poses)
-                        person_status = "Нет человека"
-                        person_detected = "Нет"
-                        if poses:
-                            for pose_data in poses:
-                                keypoints = process_output(pose_data)
-                                draw_skeleton(cropped_image, keypoints)
-                                
-                                if keypoints is not None:
-                                    if is_person_sitting(keypoints):
-                                        person_status = "Сидит"
-                                    else:
-                                        person_status = "Стоит"
-                                    person_detected = "Да"
-                        
-                        emotions = detector.detect_emotions(frame)
                         try:
-                            dominant_emotion = max(emotions[0]['emotions'], key=emotions[0]['emotions'].get)
+                            poses = posenet_detector.process_image(cropped_image)
+                            draw_poses(cropped_image, poses)
+                            person_status = "Нет человека"
+                            person_detected = "Нет"
+                            if poses:
+                                for pose_data in poses:
+                                    keypoints = process_output(pose_data)
+                                    draw_skeleton(cropped_image, keypoints)
+                                    
+                                    if keypoints is not None:
+                                        if is_person_sitting(keypoints):
+                                            person_status = "Сидит"
+                                        else:
+                                            person_status = "Стоит"
+                                        person_detected = "Да"
+                        except:
+                            print("lol")
+                        
+                        try:
+                            dominant_emotion, _  = detector.top_emotion(cropped_image)
                         except:
                             dominant_emotion = "Нет лица"
                             
@@ -123,7 +125,7 @@ with open(csv_filename, mode='w', newline='', encoding="utf-8") as csv_file:
                         color = [int(c) for c in colors[classids[i]]]
                         cv2.rectangle(frame, (x, y), (x+w, y+h), color, 2)
                         text = "{}: {:4f} | {} | {}".format(labels[classids[i]], confidences[i], dominant_emotion, person_status)
-                        cv2.putText(frame, text, (x, y-5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
+                        cv2.putText(frame, text, (x, y-5), cv2.FONT_HERSHEY_COMPLEX, 0.5, color, 2)
                     else:
                         other_objects.append(labels[classids[i]])
                         x, y = boxes[i][0], boxes[i][1]
