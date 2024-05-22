@@ -13,7 +13,9 @@ from posenet import PoseNetDetector, draw_poses
 from sitting_check import is_person_sitting, process_output
 from bright import is_room_bright
 
-from yoloutils import infer_image
+from yoloutils import infer_image, draw_labels_and_boxes
+
+from common.helper import OUTCLS
 
 # Load labels and colors for YOLO
 labels = open("models/coco-labels.txt").read().strip().split('\n')
@@ -79,32 +81,59 @@ with open(csv_filename, mode='w', newline='', encoding="utf-8") as csv_file:
             frame, boxes, confidences, classids, idxs = infer_image(net, layer_names, \
 		    						height, width, frame, colors, labels, boxes, confidences, classids, idxs, infer=False)
             count = (count + 1) % 6
-
-        poses = posenet_detector.process_image(frame)
-        draw_poses(frame, poses)  # Draw pose keypoints
+        
+        dominant_emotion = "Нет лица"
 
         person_status = "Нет человека"
         person_detected = "Нет"
-        if poses:
-            for pose_data in poses:
-                keypoints = process_output(pose_data)
-                draw_skeleton(frame, keypoints)
-                
-                if keypoints is not None:
-                    if is_person_sitting(keypoints):
-                        person_status = "Сидит"
-                    else:
-                        person_status = "Стоит"
-                    person_detected = "Да"
 
-        room_brightness = "Ярко освещена" if is_room_bright(frame) else "Темновата"
-        emotions = detector.detect_emotions(frame)
-        try:
-            dominant_emotion = max(emotions[0]['emotions'], key=emotions[0]['emotions'].get)
-        except:
-            dominant_emotion = "Нет лица"
-        
-        other_objects = []  # This should be updated based on your detection logic
+        other_objects = []
+
+        if len(idxs) > 0:
+            for i in idxs.flatten():
+                if labels[classids[i]] in OUTCLS:
+                    if labels[classids[i]] == "person":
+                        x, y = boxes[i][0], boxes[i][1]
+                        w, h = boxes[i][2], boxes[i][3]
+                        cropped_image = frame[y:y+h, x:x+w]
+
+                        poses = posenet_detector.process_image(cropped_image)
+                        draw_poses(cropped_image, poses)
+                        person_status = "Нет человека"
+                        person_detected = "Нет"
+                        if poses:
+                            for pose_data in poses:
+                                keypoints = process_output(pose_data)
+                                draw_skeleton(cropped_image, keypoints)
+                                
+                                if keypoints is not None:
+                                    if is_person_sitting(keypoints):
+                                        person_status = "Сидит"
+                                    else:
+                                        person_status = "Стоит"
+                                    person_detected = "Да"
+                        
+                        emotions = detector.detect_emotions(frame)
+                        try:
+                            dominant_emotion = max(emotions[0]['emotions'], key=emotions[0]['emotions'].get)
+                        except:
+                            dominant_emotion = "Нет лица"
+                            
+                        frame[y:y+h, x:x+w] = cropped_image
+                        color = [int(c) for c in colors[classids[i]]]
+                        cv2.rectangle(frame, (x, y), (x+w, y+h), color, 2)
+                        text = "{}: {:4f} | {} | {}".format(labels[classids[i]], confidences[i], dominant_emotion, person_status)
+                        cv2.putText(frame, text, (x, y-5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
+                    else:
+                        other_objects.append(labels[classids[i]])
+                        x, y = boxes[i][0], boxes[i][1]
+                        w, h = boxes[i][2], boxes[i][3]
+                        color = [int(c) for c in colors[classids[i]]]
+                        cv2.rectangle(frame, (x, y), (x+w, y+h), color, 2)
+                        text = "{}: {:4f}".format(labels[classids[i]], confidences[i])
+                        cv2.putText(frame, text, (x, y-5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
+
+        room_brightness = "Ярко освещена" if is_room_bright(frame) else "Слабо освещена"
 
         writer.writerow([time.strftime("%Y-%m-%d %H:%M:%S"), room_brightness, person_status, dominant_emotion, person_detected, ", ".join(other_objects)])
 

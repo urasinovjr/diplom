@@ -35,15 +35,12 @@ def generate_boxes_confidences_classids(outs, height, width, tconf):
             confidence = scores[classid]
             
             if confidence > tconf:
-                # TODO Check detection
                 box = detection[0:4] * np.array([width, height, width, height])
                 centerX, centerY, bwidth, bheight = box.astype('int')
-
 
                 x = int(centerX - (bwidth / 2))
                 y = int(centerY - (bheight / 2))
 
-                # Append to list
                 boxes.append([x, y, int(bwidth), int(bheight)])
                 confidences.append(float(confidence))
                 classids.append(classid)
@@ -73,7 +70,5 @@ def infer_image(net, layer_names, height, width, img, colors, labels,
 
     if boxes is None or confidences is None or idxs is None or classids is None:
         raise '[ERROR] Required variables are set to None before drawing boxes on images.'
-        
-    img = draw_labels_and_boxes(img, boxes, confidences, classids, idxs, colors, labels)
 
     return img, boxes, confidences, classids, idxs
