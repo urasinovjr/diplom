@@ -1,1 +1,1 @@
-OUTCLS = ["backpack", "umbrella", "handbag", "tie", "suitcase", "bottle", "cup", "fork", "knife",  "spoon", "bowl", "chair", "phone"]
+OUTCLS = ["person", "backpack", "umbrella", "handbag", "tie", "suitcase", "bottle", "cup", "fork", "knife",  "spoon", "bowl", "chair", "cell phone"]

@@ -8,3 +8,5 @@ data\raw
 
 models
 models/yolov3.weights
+.vscode
+*.pyc
