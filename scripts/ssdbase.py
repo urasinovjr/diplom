@@ -24,6 +24,17 @@ POSE_PAIRS = [
     (11, 12), (5, 11), (6, 12), (11, 13), (13, 15), (12, 14), (14, 16)
 ]
 
+
+# Имя окна
+window_name = "Frame"
+
+# Устанавливаем размер окна
+cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)
+
+# Увеличиваем размер окна
+cv2.resizeWindow(window_name, 1280, 720)  # Замените размеры на желаемые
+
+
 print('[Status] Loading Model...')
 nn = cv2.dnn.readNetFromCaffe("models\SSD_MobileNet_prototxt.txt", "models\SSD_MobileNet.caffemodel")
 
@@ -35,6 +46,15 @@ print('[Status] Starting Video Stream...')
 vs = VideoStream(src=0).start()
 time.sleep(2.0)
 fps = FPS().start()
+
+# Имя окна
+window_name = "Image"
+
+# Устанавливаем размер окна
+cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)
+
+# Увеличиваем размер окна
+cv2.resizeWindow(window_name, 800, 600)  # Замените размеры на желаемые
 
 def draw_skeleton(image, keypoints):
     connections = [

@@ -8,10 +8,10 @@ def augment_images(input_folder, output_folder, augment_count):
         os.makedirs(output_folder)
 
     seq = iaa.Sequential([
-        iaa.Fliplr(0.5),  # Случайное отражение по горизонтали
-        iaa.Affine(rotate=(-10, 10)),  # Случайный поворот на угол от -10 до 10 градусов
-        iaa.GaussianBlur(sigma=(0, 1.0)),  # Случайное размытие
-        iaa.AdditiveGaussianNoise(scale=(0, 0.05 * 255)),  # Добавление случайного гауссовского шума
+        iaa.Fliplr(0.5),  
+        iaa.Affine(rotate=(-10, 10)),
+        iaa.GaussianBlur(sigma=(0, 1.0)),
+        iaa.AdditiveGaussianNoise(scale=(0, 0.05 * 255)),
     ])
 
     for filename in os.listdir(input_folder):

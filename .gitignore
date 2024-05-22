@@ -5,3 +5,6 @@ data\processed
 data\raw
 
 *.zipx
+
+models
+models/yolov3.weights
